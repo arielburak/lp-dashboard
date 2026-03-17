@@ -14011,13 +14011,14 @@ onValue(stateRef, (snapshot) => {
   const sentByPerson = {};
   for (const [fbKey, data] of Object.entries(localState)) {
     if (data.status === 'sent' && data.uid) {
-      // Extract fp_id from the row on the page
       const row = document.getElementById('row-' + data.uid);
       const fpId = row ? row.dataset.fpid : '';
+      // Use stored hiringFirm, or fall back to the row's data attribute
+      const firm = data.hiringFirm || (row ? row.dataset.hiringFirm : '') || '?';
       if (fpId) {
         if (!sentByPerson[fpId]) sentByPerson[fpId] = [];
         sentByPerson[fpId].push({
-          hiringFirm: data.hiringFirm || '?',
+          hiringFirm: firm,
           date: data.date || '?',
           uid: data.uid
         });
