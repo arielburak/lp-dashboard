@@ -7058,7 +7058,7 @@ onValue(stateRef, (snapshot) => {
       for (const s of sentByName[candName]) allSends[s.uid] = s;
     }
     const otherSends = Object.values(allSends).filter(s => s.uid !== uid);
-    if (otherSends.length > 0 && !(data && data.status === 'sent')) {
+    if (otherSends.length > 0 && !(data && (data.status === 'sent' || data.status === 'skip'))) {
       const warns = otherSends.map(s => s.hiringFirm + ' (' + s.date + ')').join(', ');
       row.classList.add('cross-job-warned');
       if (xjobBadge) {
