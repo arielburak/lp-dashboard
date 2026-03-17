@@ -14007,21 +14007,25 @@ const TOTAL_CANDIDATES = 194;
 onValue(stateRef, (snapshot) => {
   localState = snapshot.val() || {};
 
-  // Build a map of fp_id → [{hiringFirm, date, status, uid}] from all "sent" entries
-  const sentByPerson = {};
+  // Build maps for cross-job awareness:
+  // 1. By fp_id (same person within same data source)
+  // 2. By candidate name (same person across Ari + Manu tabs)
+  const sentByFpId = {};
+  const sentByName = {};
   for (const [fbKey, data] of Object.entries(localState)) {
     if (data.status === 'sent' && data.uid) {
       const row = document.getElementById('row-' + data.uid);
       const fpId = row ? row.dataset.fpid : '';
-      // Use stored hiringFirm, or fall back to the row's data attribute
+      const name = (data.candidateName || (row ? row.dataset.candidateName : '') || '').toLowerCase().trim();
       const firm = data.hiringFirm || (row ? row.dataset.hiringFirm : '') || '?';
+      const entry = { hiringFirm: firm, date: data.date || '?', uid: data.uid };
       if (fpId) {
-        if (!sentByPerson[fpId]) sentByPerson[fpId] = [];
-        sentByPerson[fpId].push({
-          hiringFirm: firm,
-          date: data.date || '?',
-          uid: data.uid
-        });
+        if (!sentByFpId[fpId]) sentByFpId[fpId] = [];
+        sentByFpId[fpId].push(entry);
+      }
+      if (name) {
+        if (!sentByName[name]) sentByName[name] = [];
+        sentByName[name].push(entry);
       }
     }
   }
@@ -14034,22 +14038,29 @@ onValue(stateRef, (snapshot) => {
     applyStatusDOM(uid, data ? data.status : null);
 
     // Cross-job awareness: check if this person was sent for a DIFFERENT job
+    // Match by fp_id (same source) OR by name (cross Ari/Manu tabs)
     const fpId = row.dataset.fpid;
+    const candName = (row.dataset.candidateName || '').toLowerCase().trim();
     const xjobBadge = document.getElementById('xjob-' + uid);
     row.classList.remove('cross-job-warned');
     if (xjobBadge) { xjobBadge.textContent = ''; xjobBadge.style.background = ''; }
 
-    if (fpId && sentByPerson[fpId]) {
-      const otherSends = sentByPerson[fpId].filter(s => s.uid !== uid);
-      if (otherSends.length > 0 && !(data && data.status === 'sent')) {
-        // This person was contacted for a different role — show warning
-        const warns = otherSends.map(s => s.hiringFirm + ' (' + s.date + ')').join(', ');
-        row.classList.add('cross-job-warned');
-        if (xjobBadge) {
-          xjobBadge.textContent = 'Offered to: ' + warns;
-          xjobBadge.style.background = '#fed7aa';
-          xjobBadge.style.color = '#9a3412';
-        }
+    // Collect all sends for this person from both maps, deduplicate by uid
+    const allSends = {};
+    if (fpId && sentByFpId[fpId]) {
+      for (const s of sentByFpId[fpId]) allSends[s.uid] = s;
+    }
+    if (candName && sentByName[candName]) {
+      for (const s of sentByName[candName]) allSends[s.uid] = s;
+    }
+    const otherSends = Object.values(allSends).filter(s => s.uid !== uid);
+    if (otherSends.length > 0 && !(data && data.status === 'sent')) {
+      const warns = otherSends.map(s => s.hiringFirm + ' (' + s.date + ')').join(', ');
+      row.classList.add('cross-job-warned');
+      if (xjobBadge) {
+        xjobBadge.textContent = 'Offered to: ' + warns;
+        xjobBadge.style.background = '#fed7aa';
+        xjobBadge.style.color = '#9a3412';
       }
     }
   });
