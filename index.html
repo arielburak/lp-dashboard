@@ -7018,6 +7018,7 @@ onValue(stateRef, (snapshot) => {
   // One-time migration: move old UID entries to new UID format
   if (!migrationDone) {
     migrationDone = true;
+    let didMigrate = false;
     for (const [oldKey, data] of Object.entries(localState)) {
       const oldUid = data.uid || oldKey;
       if (UID_MIGRATION[oldUid]) {
@@ -7028,10 +7029,11 @@ onValue(stateRef, (snapshot) => {
           data.uid = newUid;
           set(ref(db, 'candidate_status/' + newFbKey), data);
           remove(ref(db, 'candidate_status/' + oldKey));
+          didMigrate = true;
         }
       }
     }
-    return; // onValue will fire again after migration writes
+    if (didMigrate) return; // onValue will fire again after migration writes
   }
 
   // Build maps for cross-job awareness:
