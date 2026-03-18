@@ -91,8 +91,8 @@
 <div class="content">
   <div id="p-ari" class="tab-pane active hide-actioned">
     <div class="stats">
-      <div class="sc"><div class="l">Firms</div><div class="v">5</div></div>
-      <div class="sc"><div class="l">Roles</div><div class="v">8</div></div>
+      <div class="sc"><div class="l">Firms</div><div class="v">7</div></div>
+      <div class="sc"><div class="l">Roles</div><div class="v">15</div></div>
       <div class="sc"><div class="l">Elite Matches</div><div class="v">33</div></div>
       <div class="sc"><div class="l">Best Score</div><div class="v">199</div></div>
     </div>
@@ -11603,6 +11603,9 @@ window.filterByDate = function(val) {
     r.classList.toggle('date-match', match);
   });
   panes.forEach(p => p.classList.add('date-filter-active'));
+  const matchCount = document.querySelectorAll('.cand-row.date-match').length;
+  const el = document.getElementById('actionCount');
+  if (el) el.textContent = val ? matchCount + ' matches for ' + val + ' (today=' + todayStr + ')' : '';
 };
 
 window.sw = function(t){
