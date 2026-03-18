@@ -77,7 +77,7 @@
 </div>
 
 <div class="toolbar">
-  <label><input type="checkbox" id="hideActioned" onchange="toggleHide()"> Hide sent/skipped</label>
+  <label><input type="checkbox" id="hideActioned" onchange="toggleHide()" checked> Hide sent/skipped</label>
   <select id="dateFilter" onchange="filterByDate(this.value)" style="padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;background:#fff;">
     <option value="">All dates</option>
     <option value="today">New today</option>
@@ -89,7 +89,7 @@
 </div>
 
 <div class="content">
-  <div id="p-ari" class="tab-pane active">
+  <div id="p-ari" class="tab-pane active hide-actioned">
     <div class="stats">
       <div class="sc"><div class="l">Firms</div><div class="v">5</div></div>
       <div class="sc"><div class="l">Roles</div><div class="v">8</div></div>
@@ -2601,7 +2601,7 @@
   </div></div>
   </div>
 
-  <div id="p-manu" class="tab-pane">
+  <div id="p-manu" class="tab-pane hide-actioned">
     <div class="stats">
       <div class="sc"><div class="l">Firms</div><div class="v">21</div></div>
       <div class="sc"><div class="l">Roles</div><div class="v">55</div></div>
