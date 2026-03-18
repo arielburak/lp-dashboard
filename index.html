@@ -1,8 +1,4 @@
-<!DO
-// Default to showing only today's new candidates
-filterByDate('today');
-document.getElementById('dateFilter').value = 'today';
-CTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -84,7 +80,7 @@ CTYPE html>
   <label><input type="checkbox" id="hideActioned" onchange="toggleHide()" checked> Hide sent/skipped</label>
   <select id="dateFilter" onchange="filterByDate(this.value)" style="padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;background:#fff;">
     <option value="">All dates</option>
-    <option value="today" selected>New today</option>
+    <option value="today">New today</option>
     <option value="yesterday">New yesterday</option>
     <option value="week">New this week</option>
   </select>
@@ -11708,6 +11704,10 @@ window.submitFeedback = function(uid) {
   input.value = '';
   toast('Feedback saved');
 };
+
+// Default: hide sent/skipped on load
+document.getElementById('hideActioned').checked = true;
+toggleHide();
 </script>
 </body>
 </html>
