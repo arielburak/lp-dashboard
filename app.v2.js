@@ -193,20 +193,16 @@ window.filterByDate = function(val) {
     document.querySelectorAll('.cand-row').forEach(r => r.classList.remove('date-match'));
     return;
   }
+  // Parse number of days from value (e.g. '3d' -> 3, '7d' -> 7)
+  const days = parseInt(val);
   const now = new Date();
-  const todayStr = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
-  const yest = new Date(now); yest.setDate(yest.getDate()-1);
-  const yestStr = yest.getFullYear()+'-'+String(yest.getMonth()+1).padStart(2,'0')+'-'+String(yest.getDate()).padStart(2,'0');
-  const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate()-7);
-  const weekStr = weekAgo.getFullYear()+'-'+String(weekAgo.getMonth()+1).padStart(2,'0')+'-'+String(weekAgo.getDate()).padStart(2,'0');
+  const cutoff = new Date(now);
+  cutoff.setDate(cutoff.getDate() - days);
+  const cutoffStr = cutoff.getFullYear()+'-'+String(cutoff.getMonth()+1).padStart(2,'0')+'-'+String(cutoff.getDate()).padStart(2,'0');
 
   document.querySelectorAll('.cand-row').forEach(r => {
     const added = r.dataset.dateAdded || '';
-    let match = false;
-    if (val === 'today') match = (added === todayStr);
-    else if (val === 'yesterday') match = (added === yestStr);
-    else if (val === 'week') match = (added >= weekStr);
-    r.classList.toggle('date-match', match);
+    r.classList.toggle('date-match', added >= cutoffStr);
   });
   panes.forEach(p => p.classList.add('date-filter-active'));
 };
