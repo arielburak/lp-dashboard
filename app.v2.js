@@ -193,16 +193,31 @@ window.filterByDate = function(val) {
     document.querySelectorAll('.cand-row').forEach(r => r.classList.remove('date-match'));
     return;
   }
-  // Parse number of days from value (e.g. '3d' -> 3, '7d' -> 7)
-  const days = parseInt(val);
   const now = new Date();
-  const cutoff = new Date(now);
-  cutoff.setDate(cutoff.getDate() - days);
-  const cutoffStr = cutoff.getFullYear()+'-'+String(cutoff.getMonth()+1).padStart(2,'0')+'-'+String(cutoff.getDate()).padStart(2,'0');
+  const fmt = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  let cutoffStr, endStr;
+
+  if (val === 'today') {
+    cutoffStr = fmt(now);
+    endStr = null; // no upper bound
+  } else if (val === 'yesterday') {
+    const yd = new Date(now); yd.setDate(yd.getDate() - 1);
+    cutoffStr = fmt(yd);
+    endStr = fmt(yd); // exact match on yesterday's date
+  } else {
+    // Day range: '3d', '7d', '14d', '30d'
+    const days = parseInt(val);
+    const cutoff = new Date(now);
+    cutoff.setDate(cutoff.getDate() - days);
+    cutoffStr = fmt(cutoff);
+    endStr = null;
+  }
 
   document.querySelectorAll('.cand-row').forEach(r => {
     const added = r.dataset.dateAdded || '';
-    r.classList.toggle('date-match', added >= cutoffStr);
+    let match = added >= cutoffStr;
+    if (endStr) match = (added === endStr); // exact date match for 'yesterday'
+    r.classList.toggle('date-match', match);
   });
   panes.forEach(p => p.classList.add('date-filter-active'));
 };
